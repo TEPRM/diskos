@@ -1,0 +1,60 @@
+name: hebrew-build
+on:
+  push:
+    branches: [hebrew-fonts]
+  workflow_dispatch:
+
+jobs:
+  fonts-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: hebrew-fonts
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate Hebrew LVGL fonts
+        run: |
+          npm i -g lv_font_conv
+          cd ui
+          for SZ in 14 16 18 20; do
+            lv_font_conv --font fonts/NotoSansHebrew.ttf --size $SZ --bpp 4 \
+              --format lvgl --no-compress \
+              --range 0x0590-0x05FF --range 0xFB1D-0xFB4F \
+              --force-fast-kern-format --lv-include lvgl/lvgl.h \
+              -o font_he_$SZ.c
+          done
+          ls -l font_he_*.c
+          head -12 font_he_16.c
+
+      - name: Commit generated fonts
+        run: |
+          git config user.name "hebrew-build"
+          git config user.email "hebrew-build@users.noreply.github.com"
+          git add ui/font_he_*.c
+          git diff --cached --quiet || git commit -m "Generate Hebrew LVGL fonts from Noto Sans Hebrew"
+          git push origin hebrew-fonts || true
+
+      - name: Build UI toolchain image
+        run: docker build -t diskos-ui-builder ui
+
+      - name: Build mq_ui
+        run: |
+          cd ui
+          docker run --rm -v "$PWD:/src" diskos-ui-builder
+          ls -l mq_ui
+
+      - name: Host font coverage test
+        run: |
+          cd ui
+          python3 tests/font_coverage_test.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mq_ui-hebrew
+          path: ui/mq_ui
