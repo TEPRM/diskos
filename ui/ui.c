@@ -1707,22 +1707,22 @@ const char *ui_current_backdrop_src(void)
  * We keep mutable copies because .fallback must be set on non-const fonts. */
 static lv_font_t s_cjk; /* existing subset plus the small music-metadata supplement */
 static lv_font_t s_font20, s_font18, s_font16, s_font14;      /* Montserrat, chain heads */
-static lv_font_t s_intl20, s_intl18, s_intl16, s_intl14;      /* intl link (fallback -> Source Han) */
+static lv_font_t s_intl20, s_intl18, s_intl16, s_intl14;      /* intl link (fallback -> Hebrew) */
 static void ui_fonts_init(void)
 {
     if(s_font20.get_glyph_dsc) return;   /* once */
     s_cjk = lv_font_source_han_16_cjk; s_cjk.fallback = &font_cjk_extra_16;
-    s_intl20 = font_intl_20; s_intl20.fallback = &s_cjk;
-    s_intl18 = font_intl_18; s_intl18.fallback = &s_cjk;
-    s_intl16 = font_intl_16; s_intl16.fallback = &s_cjk;
-    s_intl14 = font_intl_14; s_intl14.fallback = &s_cjk;
-    s_font20 = *theme_font_base(20); s_font20.fallback = &s_intl20;
-    s_font18 = *theme_font_base(18); s_font18.fallback = &s_intl18;
-    s_font16 = *theme_font_base(16); s_font16.fallback = &s_intl16;
-    s_font14 = *theme_font_base(14); s_font14.fallback = &s_intl14;
+    s_he20 = font_he_20; s_he20.fallback = &s_cjk;
+    s_he18 = font_he_18; s_he18.fallback = &s_cjk;
+    s_he16 = font_he_16; s_he16.fallback = &s_cjk;
+    s_he14 = font_he_14; s_he14.fallback = &s_cjk;
+    s_intl20 = font_intl_20; s_intl20.fallback = &s_he20;
+    s_intl18 = font_intl_18; s_intl18.fallback = &s_he18;
+    s_intl16 = font_intl_16; s_intl16.fallback = &s_he16;
+    s_intl14 = font_intl_14; s_intl14.fallback = &s_he14;
 }
 
-/* Public accessor for the fallback-chained text font (Montserrat -> intl -> CJK) so other screens
+/* Public accessor for the fallback-chained text font (Montserrat -> intl -> Hebrew -> CJK) so other screens
  * render user text (track/album/artist names) with full glyph coverage. px = 14/16/18/20. */
 const lv_font_t *ui_text_font(int px){
     ui_fonts_init();
