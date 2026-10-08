@@ -10,7 +10,7 @@ lvgl = next(c for c in (app/'lvgl', app.parent/'lvgl') if (c/'src/font/lv_font.c
 source = (app/'ui.c').read_text()
 a=source.index('static lv_font_t s_cjk;'); b=source.index('/* Shared CJK-capable',a)
 chain=source[a:b]
-points=sorted(set(map(ord,'世界贈予我的妖精帝國曼衍珠汝華Nada Upasana PundarikaLudwig GöranssonZeus’s Law‘’ЛенинградΑθήνα'))- {32})
+points=sorted(set(map(ord,'世界贈予我的妖精帝國曼衍珠汝華Nada Upasana PundarikaLudwig G\u05E9\u05DC\u05D5\u05DD \u05E2\u05D1\u05E8\u05D9\u05EA12öranssonZeus’s Law‘’ЛенинградΑθήνα'))- {32})
 header=r'''
 #include "lvgl/lvgl.h"
 #include "fonts_intl.h"
@@ -51,7 +51,7 @@ int main(void){
         int bottom=(int)f->line_height-f->base_line-d.ofs_y;
         assert(top>=0 && bottom<=(int)f->line_height);
     }
-    puts("PASS reported CJK/punctuation plus Latin, Cyrillic and Greek: descriptors, pixels and line metrics at four sizes");
+    puts("PASS reported CJK/punctuation plus Latin, Cyrillic, Greek and Hebrew: descriptors, pixels and line metrics at four sizes");
     puts("HARNESS COMPLETE");
 }
 '''.replace('POINTS',','.join(hex(c) for c in points))
